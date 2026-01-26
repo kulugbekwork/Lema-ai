@@ -14,10 +14,10 @@ The forgot password functionality is already implemented in your codebase:
 ### Step 1: Configure Site URL and Redirect URLs
 
 1. Go to **Supabase Dashboard** → **Authentication** → **URL Configuration**
-2. Set **Site URL** to: `https://linkexp.xyz`
+2. Set **Site URL** to: `https://lemaai.vercel.app`
 3. Add to **Redirect URLs**:
-   - `https://linkexp.xyz`
-   - `https://linkexp.xyz/**`
+   - `https://lemaai.vercel.app`
+   - `https://lemaai.vercel.app/**`
    - `http://localhost:5173` (for local development)
    - `http://localhost:5173/**`
 
@@ -85,7 +85,7 @@ The forgot password functionality is already implemented in your codebase:
 #### Step 4: Configure Redirect URLs (Same as Option 1)
 
 1. Go to **Authentication** → **URL Configuration**
-2. Set **Site URL**: `https://linkexp.xyz`
+2. Set **Site URL**: `https://lemaai.vercel.app`
 3. Add **Redirect URLs** as listed in Option 1
 
 #### Step 5: Test

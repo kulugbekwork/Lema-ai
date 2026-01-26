@@ -168,20 +168,20 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
 
 
   return (
-    <div className="px-4 pt-2 pb-6">
-      <div className="flex gap-6 h-full max-w-7xl mx-auto">
+    <div className="px-4 sm:px-6 pt-2 pb-6">
+      <div className="flex flex-col lg:flex-row gap-6 h-full max-w-7xl mx-auto">
         {/* Left Sidebar - Profile Info */}
-        <div className="w-96 flex-shrink-0 space-y-4">
+        <div className="w-full lg:w-96 flex-shrink-0 space-y-4">
         {/* Profile Section */}
-        <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 shadow-sm">
           {/* Avatar */}
           <div className="flex flex-col items-center mb-6">
-            <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center mb-4">
-              <span className="text-4xl font-bold text-gray-600">
+            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-200 flex items-center justify-center mb-4">
+              <span className="text-3xl sm:text-4xl font-bold text-gray-600">
                 {(user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'U').charAt(0).toUpperCase()}
               </span>
-            </div>
           </div>
+        </div>
 
           {/* NAME Card */}
           <div className="bg-gray-50 rounded-md p-4 mb-3">
@@ -194,7 +194,7 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
                 </p>
               </div>
             </div>
-          </div>
+              </div>
 
           {/* EMAIL Card */}
           <div className="bg-gray-50 rounded-md p-4 mb-3">
@@ -221,9 +221,9 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
       </div>
 
       {/* Right Side - My Courses */}
-      <div className="flex-1">
-        <div className="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">My Courses</h1>
+      <div className="flex-1 w-full">
+        <div className="bg-white rounded-lg p-4 sm:p-6 border border-gray-200 shadow-sm">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">My Courses</h1>
           <div className="w-full h-px bg-gray-200 mb-6"></div>
 
           {courses.length === 0 ? (
@@ -239,13 +239,13 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
                 return (
                   <div
                     key={course.id}
-                    className="w-full bg-gray-50 rounded-md p-6 border border-gray-200"
+                    className="w-full bg-gray-50 rounded-md p-4 sm:p-6 border border-gray-200"
                   >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center space-x-2 flex-1">
+                    <div className="flex items-start justify-between mb-2 gap-2">
+                      <div className="flex items-center space-x-2 flex-1 min-w-0">
                         <BookOpen className="w-4 h-4 text-blue-600 flex-shrink-0 mt-1" />
                         {isRenaming ? (
-                          <div className="flex items-center space-x-2 flex-1">
+                          <div className="flex items-center space-x-2 flex-1 min-w-0">
                             <input
                               type="text"
                               value={renameValue}
@@ -258,7 +258,7 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
                                   setRenameValue('');
                                 }
                               }}
-                              className="flex-1 px-2 py-1 border border-gray-300 rounded text-lg font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="flex-1 min-w-0 px-2 py-1 border border-gray-300 rounded text-base sm:text-lg font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                               autoFocus
                             />
                             <button
@@ -276,18 +276,18 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
                             >
                               <X className="w-4 h-4" />
                             </button>
-                          </div>
+          </div>
                         ) : (
                           <h3
                             onClick={() => onSelectCourse(course.id)}
-                            className="text-lg font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                            className="text-base sm:text-lg font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors break-words"
                           >
                             {course.title}
                           </h3>
                         )}
-                      </div>
+              </div>
                       {!isRenaming && (
-                        <div className="relative" ref={openMenuId === course.id ? menuRef : null}>
+                        <div className="relative flex-shrink-0" ref={openMenuId === course.id ? menuRef : null}>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -319,22 +319,22 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
                                 <Trash2 className="w-4 h-4" />
                                 <span>Delete</span>
                               </button>
-                            </div>
+            </div>
                           )}
-                        </div>
+              </div>
                       )}
-                    </div>
+            </div>
                     {course.description && !isRenaming && (
-                      <p className="text-sm text-gray-500 ml-6">{course.description}</p>
+                      <p className="text-sm text-gray-500 ml-6 mt-2 break-words">{course.description}</p>
                     )}
-                  </div>
+              </div>
                 );
               })}
             </div>
           )}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
     </div>
   );
 }

@@ -547,22 +547,23 @@ export function SlideViewer({
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <button
               onClick={onBack}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors text-sm sm:text-base"
             >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-medium">Back to Course</span>
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="font-medium hidden sm:inline">Back to Course</span>
+              <span className="font-medium sm:hidden">Back</span>
             </button>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 text-gray-600">
-                <Clock className="w-4 h-4" />
-                <span className="text-sm font-medium">{estimatedDuration} min</span>
+            <div className="flex items-center space-x-3 sm:space-x-4">
+              <div className="flex items-center space-x-1.5 sm:space-x-2 text-gray-600">
+                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="text-xs sm:text-sm font-medium">{estimatedDuration} min</span>
               </div>
-              <div className="text-sm font-medium text-gray-600">
+              <div className="text-xs sm:text-sm font-medium text-gray-600">
                 {currentIndex + 1} / {getTotalItems()}
               </div>
             </div>
@@ -579,31 +580,31 @@ export function SlideViewer({
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-8">
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="w-full max-w-4xl">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 min-h-[500px] flex flex-col">
-            <div className="p-8 sm:p-12 flex-1">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 min-h-[400px] sm:min-h-[500px] flex flex-col">
+            <div className="p-4 sm:p-6 lg:p-8 xl:p-12 flex-1 overflow-y-auto">
               {currentItem.type === 'slide' ? (
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-6">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 break-words">
                     {(currentItem.data as Slide).title}
                   </h2>
-                  <div className="prose prose-lg max-w-none">
+                  <div className="prose prose-sm sm:prose-base lg:prose-lg max-w-none">
                     {formatContent((currentItem.data as Slide).content)}
                   </div>
                 </div>
               ) : (
                 <div>
-                  <div className="bg-blue-50 border-l-4 border-blue-600 p-4 mb-6">
-                    <h3 className="text-lg font-bold text-blue-900 mb-2">Quiz Question</h3>
-                    <p className="text-blue-800">Test your understanding of what you just learned</p>
+                  <div className="bg-blue-50 border-l-4 border-blue-600 p-3 sm:p-4 mb-4 sm:mb-6">
+                    <h3 className="text-base sm:text-lg font-bold text-blue-900 mb-1 sm:mb-2">Quiz Question</h3>
+                    <p className="text-sm sm:text-base text-blue-800">Test your understanding of what you just learned</p>
                   </div>
 
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 break-words">
                     {(currentItem.data as Question).question_text}
                   </h2>
 
-                  <div className="space-y-3 mb-6">
+                  <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                     {['a', 'b', 'c', 'd'].map((option) => {
                       const question = currentItem.data as Question;
                       const optionText = question[`option_${option}` as keyof Question] as string;
@@ -612,7 +613,7 @@ export function SlideViewer({
                       const wasSelected = existingAnswer?.selected_answer === option;
                       const isCorrect = question.correct_answer === option;
 
-                      let buttonClass = 'w-full text-left p-4 rounded-xl border-2 transition-all ';
+                      let buttonClass = 'w-full text-left p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all ';
 
                       if (showResult || existingAnswer) {
                         if (wasSelected && isCorrect) {
@@ -642,8 +643,8 @@ export function SlideViewer({
                           className={buttonClass}
                         >
                           <div className="flex items-center">
-                            <span className="font-bold text-lg mr-3">{option.toUpperCase()}.</span>
-                            <span className="font-medium">{optionText}</span>
+                            <span className="font-bold text-base sm:text-lg mr-2 sm:mr-3 flex-shrink-0">{option.toUpperCase()}.</span>
+                            <span className="font-medium text-sm sm:text-base break-words">{optionText}</span>
                           </div>
                         </button>
                       );
@@ -651,12 +652,12 @@ export function SlideViewer({
                   </div>
 
                   {(showResult || userAnswers.has((currentItem.data as Question).id)) && (
-                    <div className={`p-4 rounded-xl ${
+                    <div className={`p-3 sm:p-4 rounded-lg sm:rounded-xl ${
                       userAnswers.get((currentItem.data as Question).id)?.is_correct
                         ? 'bg-green-50 border border-green-200'
                         : 'bg-red-50 border border-red-200'
                     }`}>
-                      <p className={`font-bold mb-2 ${
+                      <p className={`font-bold mb-1 sm:mb-2 text-sm sm:text-base ${
                         userAnswers.get((currentItem.data as Question).id)?.is_correct
                           ? 'text-green-900'
                           : 'text-red-900'
@@ -665,7 +666,7 @@ export function SlideViewer({
                           ? 'Correct!'
                           : 'Incorrect'}
                       </p>
-                      <p className="text-gray-700">
+                      <p className="text-sm sm:text-base text-gray-700 break-words">
                         {(currentItem.data as Question).explanation}
                       </p>
                     </div>
@@ -675,24 +676,25 @@ export function SlideViewer({
               )}
             </div>
 
-            <div className="border-t border-gray-200 bg-gray-50 p-6">
-              <div className="flex items-center gap-4">
+            <div className="border-t border-gray-200 bg-gray-50 p-4 sm:p-6">
+              <div className="flex items-center gap-3 sm:gap-4">
                 <button
                   onClick={handlePrevious}
                   disabled={currentIndex === 0}
-                  className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-md font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 flex items-center justify-center space-x-1.5 sm:space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-md font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                 >
-                  <ArrowLeft className="w-5 h-5" />
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Previous</span>
                 </button>
 
                 {isLastItem && allQuestionsAnswered ? (
                   <button
                     onClick={onComplete}
-                    className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-md font-semibold hover:bg-green-700 transition-colors"
+                    className="flex-1 flex items-center justify-center space-x-1.5 sm:space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 text-white rounded-md font-semibold hover:bg-green-700 transition-colors text-sm sm:text-base"
                   >
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span>Complete Lesson</span>
+                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="hidden sm:inline">Complete Lesson</span>
+                    <span className="sm:hidden">Complete</span>
                   </button>
                 ) : (
                   <button
@@ -701,10 +703,10 @@ export function SlideViewer({
                       currentIndex === getTotalItems() - 1 ||
                       (currentItem.type === 'question' && !showResult && !userAnswers.has((currentItem.data as Question).id))
                     }
-                    className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center space-x-1.5 sm:space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                   >
                     <span>Next</span>
-                    <ArrowRight className="w-5 h-5" />
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 )}
               </div>
