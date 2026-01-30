@@ -324,7 +324,7 @@ export function LandingPage({ onGetStarted, onSignIn }: LandingPageProps) {
                   Upgrade to Premium
                 </button>
                 <div className="space-y-3">
-                  <p className="text-sm text-gray-700">✓ Unlimited AI-generated courses</p>
+                  <p className="text-sm text-gray-700">✓ Up to 10 AI-generated courses</p>
                   <p className="text-sm text-gray-700">✓ Regenerate courses anytime</p>
                   <p className="text-sm text-gray-700">✓ Structured lessons for any topic</p>
                   <p className="text-sm text-gray-700">✓ Quizzes included in lessons</p>

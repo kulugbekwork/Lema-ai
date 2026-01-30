@@ -146,6 +146,11 @@ export function HomePage({ onSelectCourse, onUpgrade }: HomePageProps) {
           setShowUpgradeModal(true);
           return;
         }
+        if (premium && totalCoursesCreated >= 10) {
+          setShowUpgradeModal(true);
+          setError("You've reached your 10 course limit for the premium plan.");
+          return;
+        }
       }
 
       setCreating(true);
@@ -375,7 +380,7 @@ export function HomePage({ onSelectCourse, onUpgrade }: HomePageProps) {
               You’ve created your first course
             </h2>
             <p className="text-gray-600 text-base mb-6">
-              That’s the free plan. Upgrade to create unlimited courses and keep
+              That's the free plan. Upgrade to create up to 10 courses and keep
               learning without limits.
             </p>
             <button
@@ -385,7 +390,7 @@ export function HomePage({ onSelectCourse, onUpgrade }: HomePageProps) {
               }}
               className="w-full bg-blue-600 text-white px-4 py-3 rounded-md hover:bg-blue-700 transition-colors font-semibold"
             >
-              Unlock Unlimited Courses
+              Upgrade to Premium
             </button>
             <button
               onClick={() => setShowUpgradeModal(false)}

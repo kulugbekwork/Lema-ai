@@ -101,10 +101,10 @@ export function PremiumPage() {
             Upgrade to Premium
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Go <span className="italic text-blue-600">Premium</span>. Create Unlimited Courses.
+            Go <span className="italic text-blue-600">Premium</span>. Create Up to 10 Courses.
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-            The free plan includes 1 course. Premium lets you create unlimited courses anytime.
+            The free plan includes 1 course. Premium lets you create up to 10 courses.
           </p>
         </div>
 
@@ -140,7 +140,7 @@ export function PremiumPage() {
               {upgrading === 'Monthly' ? 'Redirecting...' : 'Upgrade to Premium'}
             </button>
             <div className="space-y-3">
-              <p className="text-sm text-gray-700">✓ Unlimited AI-generated courses</p>
+              <p className="text-sm text-gray-700">✓ Up to 10 AI-generated courses</p>
               <p className="text-sm text-gray-700">✓ Regenerate courses anytime</p>
               <p className="text-sm text-gray-700">✓ Structured lessons for any topic</p>
               <p className="text-sm text-gray-700">✓ Quizzes included in lessons</p>
