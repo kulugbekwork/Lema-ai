@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { GraduationCap } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { useState } from "react";
+import { GraduationCap } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 interface LoginPageProps {
   onForgotPassword: () => void;
@@ -9,31 +9,37 @@ interface LoginPageProps {
 
 export function LoginPage({ onForgotPassword, onSignUp }: LoginPageProps) {
   const { signInWithGoogle, signInWithEmail } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
     try {
-      setError('');
+      setError("");
       await signInWithGoogle();
-    } catch (error: any) {
-      console.error('Error signing in:', error);
-      setError(error.message || 'Failed to sign in with Google');
+    } catch (error) {
+      console.error("Error signing in:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to sign in with Google",
+      );
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       await signInWithEmail(email, password);
-    } catch (error: any) {
-      console.error('Error signing in:', error);
-      setError(error.message || 'Invalid email or password');
+    } catch (error) {
+      console.error("Error signing in:", error);
+      setError(
+        error instanceof Error ? error.message : "Invalid email or password",
+      );
     } finally {
       setLoading(false);
     }
@@ -44,8 +50,10 @@ export function LoginPage({ onForgotPassword, onSignUp }: LoginPageProps) {
       <div className="flex-1 flex items-center justify-center px-8 py-12 lg:px-12">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Sign in</h1>
-            <p className="text-gray-600">Welcome back! Please enter your details.</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Log in</h1>
+            <p className="text-gray-600">
+              Welcome back! Please enter your details.
+            </p>
           </div>
 
           {error && (
@@ -133,17 +141,17 @@ export function LoginPage({ onForgotPassword, onSignUp }: LoginPageProps) {
                 disabled={loading}
                 className="w-full bg-gray-900 text-white rounded-lg px-6 py-3 font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
-                {loading ? 'Signing in...' : 'Continue'}
+                {loading ? "Signing in..." : "Continue"}
               </button>
             </form>
 
             <p className="text-sm text-gray-600 text-center mt-6">
-              Don't have an account?{' '}
+              Don't have an account?{" "}
               <button
                 onClick={onSignUp}
                 className="text-gray-900 font-semibold hover:underline"
               >
-                Sign in
+                Sign up
               </button>
             </p>
           </div>
@@ -165,11 +173,11 @@ export function LoginPage({ onForgotPassword, onSignUp }: LoginPageProps) {
               <GraduationCap className="w-14 h-14 text-white" />
             </div>
             <h2 className="text-4xl font-bold text-white mb-4">
-              Master Any Subject with AI
+              Learn Faster with AI Generated Courses
             </h2>
             <p className="text-xl text-gray-300 leading-relaxed">
-              Get personalized learning paths and AI-generated courses with interactive lessons.
-              Transform your learning journey with intelligent course creation.
+              Stop searching for resources. Lema AI builds clear, step-by-step
+              courses so you can focus on learning.
             </p>
           </div>
         </div>

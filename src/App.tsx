@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
@@ -6,28 +7,20 @@ import { SignUpPage } from './pages/SignUpPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { DashboardLayout } from './components/DashboardLayout';
-import { supabase } from './lib/supabase';
 
-type AuthView = 'landing' | 'login' | 'signup' | 'forgot-password' | 'reset-password';
-
-function App() {
-  const { user, loading, session } = useAuth();
-  const [authView, setAuthView] = useState<AuthView>('landing');
+function AppContent() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [checkingReset, setCheckingReset] = useState(true);
 
   useEffect(() => {
-    // Check if URL contains password reset token
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const type = hashParams.get('type');
-    const accessToken = hashParams.get('access_token');
+    // Check if URL contains password reset token in search params
+    const searchParams = new URLSearchParams(window.location.search);
+    const type = searchParams.get('type');
 
-    if (type === 'recovery' && accessToken) {
-      // User clicked password reset link - Supabase will automatically process this
-      // Wait a moment for Supabase to process the hash
-      setTimeout(() => {
-        setAuthView('reset-password');
-        setCheckingReset(false);
-      }, 500);
+    if (type === 'recovery') {
+      setCheckingReset(false);
     } else {
       setCheckingReset(false);
     }
@@ -44,46 +37,33 @@ function App() {
     );
   }
 
-  // Show reset password page if user has recovery session (clicked reset link)
-  if (authView === 'reset-password') {
-    return (
-      <ResetPasswordPage
-        onSuccess={() => {
-          // Clear hash and redirect to login
-          window.history.replaceState(null, '', window.location.pathname);
-          setAuthView('login');
-        }}
-      />
-    );
-  }
-
   if (!user) {
-    if (authView === 'signup') {
-      return <SignUpPage onBackToLogin={() => setAuthView('login')} />;
-    }
-
-    if (authView === 'forgot-password') {
-      return <ForgotPasswordPage onBackToLogin={() => setAuthView('login')} />;
-    }
-
-    if (authView === 'login') {
-      return (
-        <LoginPage
-          onForgotPassword={() => setAuthView('forgot-password')}
-          onSignUp={() => setAuthView('signup')}
-        />
-      );
-    }
-
     return (
-      <LandingPage
-        onGetStarted={() => setAuthView('signup')}
-        onSignIn={() => setAuthView('login')}
-      />
+      <Routes>
+        <Route path="/login" element={<LoginPage onForgotPassword={() => navigate('/forgot-password')} onSignUp={() => navigate('/signup')} />} />
+        <Route path="/signup" element={<SignUpPage onBackToLogin={() => navigate('/login')} />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage onBackToLogin={() => navigate('/login')} />} />
+        <Route path="/reset-password" element={<ResetPasswordPage onSuccess={() => navigate('/login')} />} />
+        <Route path="/" element={<LandingPage onGetStarted={() => navigate('/signup')} onSignIn={() => navigate('/login')} />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     );
   }
 
-  return <DashboardLayout />;
+  return (
+    <Routes>
+      <Route path="/*" element={<DashboardLayout />} />
+      <Route path="/" element={<Navigate to="/home" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
 }
 
 export default App;

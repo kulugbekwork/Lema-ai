@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
-import { User, BookOpen, Globe, MoreVertical, Trash2, Edit2, X } from 'lucide-react';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { User, BookOpen, Globe, MoreVertical, Trash2, Edit2, X, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 
@@ -22,9 +22,10 @@ interface Course {
 
 interface ProfilePageProps {
   onSelectCourse: (courseId: string) => void;
+  onUpgrade?: () => void;
 }
 
-export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
+export function ProfilePage({ onSelectCourse, onUpgrade }: ProfilePageProps) {
   const { user } = useAuth();
   const [stats, setStats] = useState<UserStats>({
     totalCourses: 0,
@@ -38,11 +39,63 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [renamingCourseId, setRenamingCourseId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [isPremium, setIsPremium] = useState(false);
+  const [loadingPortal, setLoadingPortal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const loadProfileData = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('is_premium')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      setIsPremium(Boolean((profileData as unknown as {is_premium: boolean})?.is_premium ?? false));
+      
+      // Note: Customer ID is stored in the DB via webhook, but we open main dashboard instead of customer portal
+
+      const { data: coursesData } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      const totalCourses = coursesData?.length || 0;
+      const activeCourses = coursesData?.filter((c: unknown) => (c as Course).status === 'active').length || 0;
+      const completedCourses = coursesData?.filter((c: unknown) => (c as Course).status === 'completed').length || 0;
+
+      setCourses(coursesData || []);
+
+      const { data: progressData } = await supabase
+        .from('user_progress')
+        .select('completed')
+        .eq('user_id', user.id);
+
+      const totalLessons = progressData?.length || 0;
+      const completedLessons = progressData?.filter((p: unknown) => (p as {completed: boolean}).completed).length || 0;
+
+      setStats({
+        totalCourses,
+        activeCourses,
+        completedCourses,
+        totalLessons,
+        completedLessons,
+      });
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  
 
   useEffect(() => {
     loadProfileData();
-  }, [user]);
+  }, [loadProfileData]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -60,44 +113,6 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [openMenuId]);
-
-  const loadProfileData = async () => {
-    if (!user) return;
-
-    try {
-      const { data: coursesData } = await supabase
-        .from('courses')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      const totalCourses = coursesData?.length || 0;
-      const activeCourses = coursesData?.filter((c: any) => c.status === 'active').length || 0;
-      const completedCourses = coursesData?.filter((c: any) => c.status === 'completed').length || 0;
-
-      setCourses(coursesData || []);
-
-      const { data: progressData } = await supabase
-        .from('user_progress')
-        .select('completed')
-        .eq('user_id', user.id);
-
-      const totalLessons = progressData?.length || 0;
-      const completedLessons = progressData?.filter((p: any) => p.completed).length || 0;
-
-      setStats({
-        totalCourses,
-        activeCourses,
-        completedCourses,
-        totalLessons,
-        completedLessons,
-      });
-    } catch (error) {
-      console.error('Error loading profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeleteCourse = async (courseId: string) => {
     if (!confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
@@ -130,7 +145,8 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
     }
 
     try {
-      const { error } = await (supabase.from('courses') as any)
+      const { error } = await (supabase
+        .from('courses') as unknown as {update: (obj: Record<string, unknown>) => {eq: (id: string, val: string) => Promise<{data: unknown, error: unknown}>}})
         .update({ title: renameValue.trim() })
         .eq('id', courseId);
 
@@ -153,6 +169,52 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
     setRenamingCourseId(course.id);
     setRenameValue(course.title);
     setOpenMenuId(null);
+  };
+
+  const handleManageSubscription = async () => {
+    setLoadingPortal(true);
+    try {
+      // Get the JWT token from Supabase auth
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        alert('Please log in to manage your subscription');
+        return;
+      }
+
+      // Call the get-billing-portal function
+      const response = await fetch(
+        'https://oavcemszbonnwuvwgyst.supabase.co/functions/v1/get-billing-portal',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('Error fetching portal URL:', error);
+        alert('Failed to load billing portal. Please try again.');
+        return;
+      }
+
+      const data = await response.json();
+      
+      if (data.url) {
+        // Redirect to the Lemon Squeezy customer portal
+        window.location.href = data.url;
+      } else {
+        alert('Unable to generate billing portal URL. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error handling subscription management:', error);
+      alert('An error occurred. Please try again.');
+    } finally {
+      setLoadingPortal(false);
+    }
   };
 
   if (loading) {
@@ -204,6 +266,35 @@ export function ProfilePage({ onSelectCourse }: ProfilePageProps) {
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">EMAIL</p>
                 <p className="text-sm font-medium text-gray-900">{user?.email}</p>
               </div>
+            </div>
+          </div>
+
+          {/* PLAN Card */}
+          <div className="bg-gray-50 rounded-md p-4 mb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-start space-x-3">
+                <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">PLAN</p>
+                  <p className="text-sm font-medium text-gray-900">{isPremium ? 'Premium' : 'Free'}</p>
+                </div>
+              </div>
+              {isPremium ? (
+                <button
+                  onClick={handleManageSubscription}
+                  disabled={loadingPortal}
+                  className="ml-4 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-semibold whitespace-nowrap"
+                >
+                  {loadingPortal ? 'Loading...' : 'Manage'}
+                </button>
+              ) : (
+                <button
+                  onClick={onUpgrade}
+                  className="ml-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-semibold whitespace-nowrap"
+                >
+                  Upgrade
+                </button>
+              )}
             </div>
           </div>
 

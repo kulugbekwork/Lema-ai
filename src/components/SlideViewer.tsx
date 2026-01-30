@@ -559,10 +559,6 @@ export function SlideViewer({
             </button>
 
             <div className="flex items-center space-x-3 sm:space-x-4">
-              <div className="flex items-center space-x-1.5 sm:space-x-2 text-gray-600">
-                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="text-xs sm:text-sm font-medium">{estimatedDuration} min</span>
-              </div>
               <div className="text-xs sm:text-sm font-medium text-gray-600">
                 {currentIndex + 1} / {getTotalItems()}
               </div>
